@@ -1494,6 +1494,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 
 							if($window.rangy && $window.rangy.saveSelection) {
 								_savedSelection = $window.rangy.saveSelection();
+								console.log("saved selection", _savedSelection);
 							}
 							return false;
 						});
