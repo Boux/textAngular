@@ -1513,7 +1513,6 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.append(dropdownEl);
 
 							toolDefinition.action = function(deferred, restoreSelection) {
-								console.log("default popo action");
 								restoreSelection();
 								return false;
 							}
@@ -1649,10 +1648,13 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			// pass into the action the deferred function and also the function to reload the current selection if rangy available
 			var result;
 			try{
-				if(actionIndex)
+				if(actionIndex) {
+					console.log("executing array action " + actionIndex);
 					result = this.actions[actionIndex](deferred, _editor.startAction());
-				else
+				} else {
+					console.log("executing normal action");
 					result = this.action(deferred, _editor.startAction());
+				}
 			}catch(any){}
 			if(result || result === undefined){
 				// if true or undefined is returned then the action has finished. Otherwise the deferred action will be resolved manually.
