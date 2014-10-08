@@ -1510,7 +1510,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.addClass("dropdown");
 							toolElement.addClass("dropdown-toggle");
 
-							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
+							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a unselectable=\"on\" ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
 							toolElement.append(dropdownEl);
 						}
 
