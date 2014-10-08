@@ -1476,18 +1476,25 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('unselectable', 'on');
 						toolElement.attr('ng-disabled', 'isDisabled()');
 						toolElement.attr('tabindex', '-1');
-						toolElement.attr('ng-click', 'executeAction()');
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
+						if(!angular.isDefined(toolDefinition.actions)) {
+							toolElement.attr('ng-click', 'executeAction()');
+						}
 
 						if (toolDefinition && toolDefinition.tooltiptext) {
 							toolElement.attr('title', toolDefinition.tooltiptext);
 						}
 
+						var _savedSelection;
 						toolElement.on('mousedown', function(e, eventData){
 							/* istanbul ignore else: this is for catching the jqLite testing*/
 							if(eventData) angular.extend(e, eventData);
 							// this prevents focusout from firing on the editor when clicking toolbar buttons
 							e.preventDefault();
+
+							if($window.rangy && $window.rangy.saveSelection) {
+								_savedSelection = $window.rangy.saveSelection();
+							}
 							return false;
 						});
 						if(toolDefinition && !toolDefinition.display && !toolScope._display){
@@ -1512,10 +1519,13 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							var dropdownEl = angular.element("<ul class=\"dropdown-menu\" unselectable=\"on\"><li ng-repeat=\"a in actions\" unselectable=\"on\"><a ng-click=\"executeAction(null, $index)\" unselectable=\"on\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\" unselectable=\"on\"> </span>{{a.text}}</a></li></ul>");
 							toolElement.append(dropdownEl);
 
-							toolDefinition.action = function(deferred, restoreSelection) {
-								restoreSelection();
-								return false;
-							}
+							toolElement.on('mouseup', function(e, eventData){
+								console.log("restoring selection...");
+								if(_savedSelection) {
+									console.log("DONE");
+									$window.rangy.restoreSelection(_savedSelection);
+								}
+							});
 						}
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);
