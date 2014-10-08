@@ -533,7 +533,6 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						if($window.rangy && $window.rangy.saveSelection){
 							_savedSelection = $window.rangy.saveSelection();
 							return function(){
-								console.log("restoring selection", _savedSelection);
 								if(_savedSelection) $window.rangy.restoreSelection(_savedSelection);
 							};
 						}
@@ -1477,14 +1476,22 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('unselectable', 'on');
 						toolElement.attr('ng-disabled', 'isDisabled()');
 						toolElement.attr('tabindex', '-1');
-						toolElement.attr('ng-click', 'executeAction()');
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
+
+						if(!angular.isDefined(toolDefinition.actions)) {
+							toolElement.attr('ng-click', 'executeAction()');
+						}
 
 						if (toolDefinition && toolDefinition.tooltiptext) {
 							toolElement.attr('title', toolDefinition.tooltiptext);
 						}
 
+						var _savedSelection;
 						toolElement.on('mousedown', function(e, eventData){
+							if($window.rangy && $window.rangy.saveSelection) {
+								_savedSelection = $window.rangy.saveSelection();
+							}
+
 							/* istanbul ignore else: this is for catching the jqLite testing*/
 							if(eventData) angular.extend(e, eventData);
 							// this prevents focusout from firing on the editor when clicking toolbar buttons
@@ -1510,8 +1517,13 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.addClass("dropdown");
 							toolElement.addClass("dropdown-toggle");
 
-							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a unselectable=\"on\" ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
+							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
 							toolElement.append(dropdownEl);
+
+							toolElement.on('mouseup', function(e, eventData) {
+								console.log("RESTORING SELECTION", _savedSelection);
+								if(_savedSelection) $window.rangy.restoreSelection(_savedSelection);
+							});
 						}
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);
