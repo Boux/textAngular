@@ -180,6 +180,28 @@ angular.module('textAngularSetup', [])
 			activeState: _retActiveStateFunction(h.toLowerCase())
 		});
 	});
+  taRegisterTool('headers', {
+    buttontext: "Headers",
+    actions: [{
+      text: "H1",
+      action: function() { return this.$editor().wrapSelection("formatBlock", "<H1>"); }
+    }, {
+      text: "H2",
+      action: function() { return this.$editor().wrapSelection("formatBlock", "<H2>"); }
+    }, {
+      text: "H3",
+      action: function() { return this.$editor().wrapSelection("formatBlock", "<H3>"); }
+    }, {
+      text: "H4",
+      action: function() { return this.$editor().wrapSelection("formatBlock", "<H4>"); }
+    }, {
+      text: "H5",
+      action: function() { return this.$editor().wrapSelection("formatBlock", "<H5>"); }
+    }, {
+      text: "H6",
+      action: function() { return this.$editor().wrapSelection("formatBlock", "<H6>"); }
+    }]
+  });
 	taRegisterTool('p', {
 		buttontext: 'P',
 		tooltiptext: taTranslations.p.tooltip,

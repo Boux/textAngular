@@ -196,6 +196,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 					manually call `deferred.resolve();` elsewhere to notify the editor that the action has finished.
 					restoreSelection is only defined if the rangy library is included and it can be called as `restoreSelection()` to restore the users
 					selection in the WYSIWYG editor.
+			actions: [array]
+          an array of action (same as above) { iconclass: [string], text: [string], action: [function(deferred, restoreSelection)] }
 			display: [string]?
 					Optional, an HTML element to be displayed as the button. The `scope` of the button is the tool definition object with some additional functions
 					If set this will cause buttontext and iconclass to be ignored
@@ -1474,8 +1476,10 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('unselectable', 'on');
 						toolElement.attr('ng-disabled', 'isDisabled()');
 						toolElement.attr('tabindex', '-1');
-						toolElement.attr('ng-click', 'executeAction()');
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
+						if(!angular.isDefined(toolDefinition.actions)) {
+              toolElement.attr('ng-click', 'executeAction()');
+            }
 
 						if (toolDefinition && toolDefinition.tooltiptext) {
 							toolElement.attr('title', toolDefinition.tooltiptext);
@@ -1502,6 +1506,14 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 								if(content && content !== '') toolElement.append('&nbsp;' + content);
 							}
 						}
+
+            if(angular.isDefined(toolDefinition.actions)) {
+              toolElement.addClass("dropdown");
+              toolElement.addClass("dropdown-toggle");
+
+              var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
+              toolElement.append(dropdownEl);
+            }
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);
 
@@ -1552,7 +1564,12 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							// a tool name (key name from taTools struct)
 							//creates a child scope of the main angularText scope and then extends the childScope with the functions of this particular tool
 							// reference to the scope and element kept
-							scope.tools[tool] = angular.extend(scope.$new(true), taTools[tool], defaultChildScope, {name: tool});
+              var childScope = { name: tool };
+              if(angular.isDefined(taTools[tool].actions)) {
+                childScope.actions = taTools[tool].actions;
+              }
+
+							scope.tools[tool] = angular.extend(scope.$new(true), taTools[tool], defaultChildScope, childScope);
 							scope.tools[tool].$element = setupToolElement(taTools[tool], scope.tools[tool]);
 							// append the tool compiled with the childScope to the group element
 							groupElement.append(scope.tools[tool].$element);
@@ -1617,8 +1634,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 		}
 	]).service('taToolExecuteAction', ['$q', function($q){
 		// this must be called on a toolScope or instance
-		return function(editor){
-      console.log(editor);
+		return function(editor, actionIndex){
 			if(editor !== undefined) this.$editor = function(){ return editor; };
 			var deferred = $q.defer(),
 				promise = deferred.promise,
@@ -1629,7 +1645,10 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			// pass into the action the deferred function and also the function to reload the current selection if rangy available
 			var result;
 			try{
-				result = this.action(deferred, _editor.startAction());
+        if(actionIndex)
+          result = this.actions[actionIndex](deferred, _editor.startAction());
+        else
+          result = this.action(deferred, _editor.startAction());
 			}catch(any){}
 			if(result || result === undefined){
 				// if true or undefined is returned then the action has finished. Otherwise the deferred action will be resolved manually.
@@ -1705,6 +1724,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 								if(tool.commandKeyCode && tool.commandKeyCode === event.which){
 									for(var _t = 0; _t < _toolbars.length; _t++){
 										if(_toolbars[_t].tools[name] !== undefined){
+                      console.log(scope);
 											taToolExecuteAction.call(_toolbars[_t].tools[name], scope);
 											result = true;
 											break;
