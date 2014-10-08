@@ -1512,12 +1512,6 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 
 							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
 							toolElement.append(dropdownEl);
-
-							toolDefinition.action = function(deferred, restoreSelection) {
-								console.log("what the bitch?");
-								restoreSelection();
-								return false;
-							}
 						}
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);

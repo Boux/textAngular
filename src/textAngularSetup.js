@@ -200,7 +200,12 @@ angular.module('textAngularSetup', [])
 		}, {
 			text: "H6",
 			action: function() { return this.$editor().wrapSelection("formatBlock", "<H6>"); }
-		}]
+		}],
+		action: function(deferred, restoreSelection) {
+			console.log("headers action yo");
+			restoreSelection();
+			return false;
+		}
 	});
 	taRegisterTool('p', {
 		buttontext: 'P',
