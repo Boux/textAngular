@@ -1487,15 +1487,17 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 
 						var _savedSelection;
 						toolElement.on('mousedown', function(e, eventData){
-							/* istanbul ignore else: this is for catching the jqLite testing*/
-							if(eventData) angular.extend(e, eventData);
-							// this prevents focusout from firing on the editor when clicking toolbar buttons
-							e.preventDefault();
 
+							console.log("saving selection", $window.rangy);
 							if($window.rangy && $window.rangy.saveSelection) {
 								_savedSelection = $window.rangy.saveSelection();
 								console.log("saved selection", _savedSelection);
 							}
+
+							/* istanbul ignore else: this is for catching the jqLite testing*/
+							if(eventData) angular.extend(e, eventData);
+							// this prevents focusout from firing on the editor when clicking toolbar buttons
+							e.preventDefault();
 							return false;
 						});
 						if(toolDefinition && !toolDefinition.display && !toolScope._display){
