@@ -1476,10 +1476,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('unselectable', 'on');
 						toolElement.attr('ng-disabled', 'isDisabled()');
 						toolElement.attr('tabindex', '-1');
+						toolElement.attr('ng-click', 'executeAction()');
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
-						if(!angular.isDefined(toolDefinition.actions)) {
-							toolElement.attr('ng-click', 'executeAction()');
-						}
 
 						if (toolDefinition && toolDefinition.tooltiptext) {
 							toolElement.attr('title', toolDefinition.tooltiptext);
@@ -1513,6 +1511,12 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 
 							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
 							toolElement.append(dropdownEl);
+
+							toolDefinition.action = function(deferred, restoreSelection) {
+								console.log("default popo action");
+								restoreSelection();
+								return false;
+							}
 						}
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);
@@ -1724,7 +1728,6 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 								if(tool.commandKeyCode && tool.commandKeyCode === event.which){
 									for(var _t = 0; _t < _toolbars.length; _t++){
 										if(_toolbars[_t].tools[name] !== undefined){
-											console.log(scope);
 											taToolExecuteAction.call(_toolbars[_t].tools[name], scope);
 											result = true;
 											break;
