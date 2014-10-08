@@ -1514,6 +1514,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.append(dropdownEl);
 
 							toolDefinition.action = function(deferred, restoreSelection) {
+								console.log("what the bitch?");
 								restoreSelection();
 								return false;
 							}
