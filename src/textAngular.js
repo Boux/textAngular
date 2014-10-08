@@ -1618,6 +1618,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 	]).service('taToolExecuteAction', ['$q', function($q){
 		// this must be called on a toolScope or instance
 		return function(editor){
+      console.log(editor);
 			if(editor !== undefined) this.$editor = function(){ return editor; };
 			var deferred = $q.defer(),
 				promise = deferred.promise,
