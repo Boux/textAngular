@@ -197,7 +197,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 					restoreSelection is only defined if the rangy library is included and it can be called as `restoreSelection()` to restore the users
 					selection in the WYSIWYG editor.
 			actions: [array]
-          an array of action (same as above) { iconclass: [string], text: [string], action: [function(deferred, restoreSelection)] }
+					an array of action (same as above) { iconclass: [string], text: [string], action: [function(deferred, restoreSelection)] }
 			display: [string]?
 					Optional, an HTML element to be displayed as the button. The `scope` of the button is the tool definition object with some additional functions
 					If set this will cause buttontext and iconclass to be ignored
@@ -473,12 +473,12 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 					});
 					scope.displayElements.scrollWindow.attr({'ng-hide': 'showHtml'});
 					if(attrs.taDefaultWrap) scope.displayElements.text.attr('ta-default-wrap', attrs.taDefaultWrap);
-					
+
 					if(attrs.taUnsafeSanitizer){
 						scope.displayElements.text.attr('ta-unsafe-sanitizer', attrs.taUnsafeSanitizer);
 						scope.displayElements.html.attr('ta-unsafe-sanitizer', attrs.taUnsafeSanitizer);
 					}
-					
+
 					// add the main elements to the origional element
 					scope.displayElements.scrollWindow.append(scope.displayElements.text);
 					element.append(scope.displayElements.scrollWindow);
@@ -960,7 +960,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 				var _isReadonly = false;
 				var _focussed = false;
 				var _disableSanitizer = attrs.taUnsafeSanitizer || taOptions.disableSanitizer;
-				
+
 				// defaults to the paragraph element, but we need the line-break or it doesn't allow you to type into the empty element
 				// non IE is '<p><br/></p>', ie is '<p></p>' as for once IE gets it correct...
 				var _defaultVal, _defaultTest;
@@ -991,7 +991,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 					if(_isInputFriendly) return element.val();
 					throw ('textAngular Error: attempting to update non-editable taBind');
 				};
-				
+
 				var _setViewValue = function(val){
 					if(!val) val = _compileHtml();
 					if(val === _defaultTest){
@@ -1001,12 +1001,12 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						if(ngModel.$viewValue !== val) ngModel.$setViewValue(val);
 					}
 				};
-				
+
 				//used for updating when inserting wrapped elements
 				scope.$parent['updateTaBind' + (attrs.id || '')] = function(){
 					if(!_isReadonly) _setViewValue();
 				};
-				
+
 				//this code is used to update the models when data is entered/deleted
 				if(_isInputFriendly){
 					if(!_isContentEditable){
@@ -1109,22 +1109,22 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							_focussed = true;
 							ngModel.$render();
 						});
-						
+
 						// prevent propagation on mousedown in editor, see #206
 						element.on('mousedown', function(event, eventData){
 							/* istanbul ignore else: this is for catching the jqLite testing*/
 							if(eventData) angular.extend(event, eventData);
-							event.stopPropagation(); 
+							event.stopPropagation();
 						});
 					}
 				}
-				
+
 				// catch DOM XSS via taSanitize
 				// Sanitizing both ways is identical
 				var _sanitize = function(unsafe){
 					return (ngModel.$oldViewValue = taSanitize(taFixChrome(unsafe), ngModel.$oldViewValue, _disableSanitizer));
 				};
-				
+
 				// trigger the validation calls
 				var _validity = function(value){
 					if(attrs.required) ngModel.$setValidity('required', !(!value || value.trim() === _defaultTest || value.trim() === ''));
@@ -1167,11 +1167,11 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 								.on('click', selectorClickHandler);
 						});
 				};
-				
+
 				var _setInnerHTML = function(newval){
 					element[0].innerHTML = newval;
 				};
-				
+
 				// changes to the model variable from outside the html/text inputs
 				ngModel.$render = function(){
 					// catch model being null or undefined
@@ -1219,7 +1219,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						}
 					}
 				};
-				
+
 				if(attrs.taReadonly){
 					//set initial value
 					_isReadonly = scope.$parent.$eval(attrs.taReadonly);
@@ -1478,8 +1478,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('tabindex', '-1');
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
 						if(!angular.isDefined(toolDefinition.actions)) {
-              toolElement.attr('ng-click', 'executeAction()');
-            }
+							toolElement.attr('ng-click', 'executeAction()');
+						}
 
 						if (toolDefinition && toolDefinition.tooltiptext) {
 							toolElement.attr('title', toolDefinition.tooltiptext);
@@ -1507,13 +1507,13 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							}
 						}
 
-            if(angular.isDefined(toolDefinition.actions)) {
-              toolElement.addClass("dropdown");
-              toolElement.addClass("dropdown-toggle");
+						if(angular.isDefined(toolDefinition.actions)) {
+							toolElement.addClass("dropdown");
+							toolElement.addClass("dropdown-toggle");
 
-              var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
-              toolElement.append(dropdownEl);
-            }
+							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
+							toolElement.append(dropdownEl);
+						}
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);
 
@@ -1564,10 +1564,10 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							// a tool name (key name from taTools struct)
 							//creates a child scope of the main angularText scope and then extends the childScope with the functions of this particular tool
 							// reference to the scope and element kept
-              var childScope = { name: tool };
-              if(angular.isDefined(taTools[tool].actions)) {
-                childScope.actions = taTools[tool].actions;
-              }
+							var childScope = { name: tool };
+							if(angular.isDefined(taTools[tool].actions)) {
+								childScope.actions = taTools[tool].actions;
+							}
 
 							scope.tools[tool] = angular.extend(scope.$new(true), taTools[tool], defaultChildScope, childScope);
 							scope.tools[tool].$element = setupToolElement(taTools[tool], scope.tools[tool]);
@@ -1645,10 +1645,10 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			// pass into the action the deferred function and also the function to reload the current selection if rangy available
 			var result;
 			try{
-        if(actionIndex)
-          result = this.actions[actionIndex](deferred, _editor.startAction());
-        else
-          result = this.action(deferred, _editor.startAction());
+				if(actionIndex)
+					result = this.actions[actionIndex](deferred, _editor.startAction());
+				else
+					result = this.action(deferred, _editor.startAction());
 			}catch(any){}
 			if(result || result === undefined){
 				// if true or undefined is returned then the action has finished. Otherwise the deferred action will be resolved manually.
@@ -1724,7 +1724,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 								if(tool.commandKeyCode && tool.commandKeyCode === event.which){
 									for(var _t = 0; _t < _toolbars.length; _t++){
 										if(_toolbars[_t].tools[name] !== undefined){
-                      console.log(scope);
+											console.log(scope);
 											taToolExecuteAction.call(_toolbars[_t].tools[name], scope);
 											result = true;
 											break;
@@ -1788,7 +1788,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 											break;
 										}
 									}
-									if(result) break; 
+									if(result) break;
 								}
 							}
 							return result;
