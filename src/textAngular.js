@@ -1490,6 +1490,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.on('mousedown', function(e, eventData){
 							if($window.rangy && $window.rangy.saveSelection) {
 								_savedSelection = $window.rangy.saveSelection();
+                console.log("savedSelection", angular.copy(_savedSelection));
 							}
 
 							/* istanbul ignore else: this is for catching the jqLite testing*/
