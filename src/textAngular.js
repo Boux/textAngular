@@ -1435,8 +1435,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			return safe;
 		};
 	}]).directive('textAngularToolbar', [
-		'$compile', 'textAngularManager', 'taOptions', 'taTools', 'taToolExecuteAction', '$window',
-		function($compile, textAngularManager, taOptions, taTools, taToolExecuteAction, $window){
+		'$compile', 'textAngularManager', 'taOptions', 'taTools', 'taToolExecuteAction', '$window', '$document', '$timeout',
+		function($compile, textAngularManager, taOptions, taTools, taToolExecuteAction, $window, $document, $timeout){
 			return {
 				scope: {
 					name: '@' // a name IS required
