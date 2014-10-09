@@ -1479,7 +1479,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
 
 						if(angular.isDefined(toolDefinition.actions)) {
-							toolElement.attr('is-open', 'dropdownOpened')
+							toolElement.attr('is-open', 'dropdownOpened');
 							toolElement.attr('ng-click', '!dropdownOpened ? executeAction() : null');
 						} else {
 							toolElement.attr('ng-click', 'executeAction()');
@@ -1666,7 +1666,7 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			var result;
 			try{
 				if(angular.isDefined(actionIndex)) {
-					result = this.actions[actionIndex].action(deferred, _editor.startAction());
+					result = this.actions[actionIndex].action.call(this, deferred, _editor.startAction());
 				} else {
 					result = this.action(deferred, _editor.startAction());
 				}
