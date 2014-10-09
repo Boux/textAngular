@@ -1478,7 +1478,10 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('tabindex', '-1');
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
 
-						if(!angular.isDefined(toolDefinition.actions)) {
+						if(angular.isDefined(toolDefinition.actions)) {
+							toolElement.attr('is-open', 'dropdownOpened')
+							toolElement.attr('ng-click', '!dropdownOpened ? executeAction() : null');
+						} else {
 							toolElement.attr('ng-click', 'executeAction()');
 						}
 
@@ -1486,11 +1489,12 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.attr('title', toolDefinition.tooltiptext);
 						}
 
+						var _activeEl;
 						var _savedSelection;
 						toolElement.on('mousedown', function(e, eventData){
 							if($window.rangy && $window.rangy.saveSelection) {
+								_activeEl = $document[0].activeElement;
 								_savedSelection = $window.rangy.saveSelection();
-								console.log("_savedSelection", _savedSelection);
 							}
 
 							/* istanbul ignore else: this is for catching the jqLite testing*/
@@ -1518,12 +1522,16 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.addClass("dropdown");
 							toolElement.addClass("dropdown-toggle");
 
-							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(null, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
+							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(undefined, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
 							toolElement.append(dropdownEl);
 
-							toolElement.on('mouseup', function(e, eventData) {
-								console.log("RESTORING SELECTION", _savedSelection);
-								if(_savedSelection) $window.rangy.restoreSelection(_savedSelection);
+							toolElement.on('focus', function(e) {
+								if(!_activeEl || !_savedSelection) return;
+
+								$timeout(function() {
+									angular.element(_activeEl).focus();
+									$window.rangy.restoreSelection(_savedSelection);
+								});
 							});
 						}
 
@@ -1658,10 +1666,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			var result;
 			try{
 				if(actionIndex) {
-					console.log("executing array action " + actionIndex);
 					result = this.actions[actionIndex](deferred, _editor.startAction());
 				} else {
-					console.log("executing normal action");
 					result = this.action(deferred, _editor.startAction());
 				}
 			}catch(any){}
