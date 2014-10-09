@@ -1665,8 +1665,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 			// pass into the action the deferred function and also the function to reload the current selection if rangy available
 			var result;
 			try{
-				if(actionIndex) {
-					result = this.actions[actionIndex](deferred, _editor.startAction());
+				if(angular.isDefined(actionIndex)) {
+					result = this.actions[actionIndex].action(deferred, _editor.startAction());
 				} else {
 					result = this.action(deferred, _editor.startAction());
 				}
