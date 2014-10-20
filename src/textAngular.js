@@ -1465,6 +1465,9 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 
 					var setupToolElement = function(toolDefinition, toolScope){
 						var toolElement;
+						var _activeEl;
+						var _savedSelection;
+
 						if(toolDefinition && toolDefinition.display){
 							toolElement = angular.element(toolDefinition.display);
 						}
@@ -1479,8 +1482,15 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
 
 						if(angular.isDefined(toolDefinition.actions)) {
+							toolScope.dropdownOpened = false;
 							toolElement.attr('is-open', 'dropdownOpened');
 							toolElement.attr('ng-click', '!dropdownOpened ? executeAction() : null');
+
+							toolScope.$watch("dropdownOpened", function(opened) {
+								if(!opened && _savedSelection) {
+									$window.rangy.removeMarkers(_savedSelection);
+								}
+							});
 						} else {
 							toolElement.attr('ng-click', 'executeAction()');
 						}
@@ -1489,10 +1499,8 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 							toolElement.attr('title', toolDefinition.tooltiptext);
 						}
 
-						var _activeEl;
-						var _savedSelection;
 						toolElement.on('mousedown', function(e, eventData){
-							if($window.rangy && $window.rangy.saveSelection) {
+							if($window.rangy && $window.rangy.saveSelection && angular.isDefined(toolDefinition.actions)) {
 								_activeEl = $document[0].activeElement;
 								_savedSelection = $window.rangy.saveSelection();
 							}
