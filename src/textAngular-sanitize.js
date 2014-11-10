@@ -490,6 +490,10 @@ function validStyles(styleAttr){
 
 // this function is used to manually allow specific attributes on specific tags with certain prerequisites
 function validCustomTag(tag, attrs, lkey, value){
+  if(lkey.lastIndexOf("data-", 0) === 0){
+    return true;
+  }
+
 	// catch the div placeholder for the iframe replacement
     if (tag === 'img' && attrs['ta-insert-video']){
         if(lkey === 'ta-insert-video' || lkey === 'allowfullscreen' || lkey === 'frameborder' || (lkey === 'contenteditble' && value === 'false')) return true;
