@@ -163,6 +163,11 @@ describe('taTools test tool actions', function(){
 			expect(button.hasClass('active'));
 		});
 		
+		it('strikeThrough button should function correctly', function(){
+			button = findAndTriggerButton('strikeThrough');
+			expect(button.hasClass('active'));
+		});
+		
 		it('ul button should function correctly', function(){
 			button = findAndTriggerButton('ul');
 			expect(button.hasClass('active'));
@@ -379,6 +384,60 @@ describe('taTools test tool actions', function(){
 			findAndTriggerButton('clear');
 			expect($rootScope.htmlcontent).toBe('<p class="test-class" style="text-align: left;">Test Content <b>that</b> <u>should</u> be cleared</p><h1>Test Other Tags</h1><ul><li>Test 1</li><li>Test 2</li></ul>');
 		});
+		
+		describe('collapsed selection in list escapse list element', function(){
+			it('as only in list', function(){
+				$rootScope.htmlcontent = '<ul><li>Test <b>1</b></li></ul>';
+				$rootScope.$digest();
+				var sel = $window.rangy.getSelection();
+				var range = $window.rangy.createRangyRange();
+				range.selectNode(jQuery('.ta-text ul li:first-child')[0]);
+				range.collapse(true);
+				sel.setSingleRange(range);
+				sel.refresh();
+				findAndTriggerButton('clear');
+				expect($rootScope.htmlcontent).toBe('<p>Test <b>1</b></p>');
+			});
+			
+			it('as first in list', function(){
+				$rootScope.htmlcontent = '<ul><li>Test <b>1</b></li><li>Test 2</li></ul>';
+				$rootScope.$digest();
+				var sel = $window.rangy.getSelection();
+				var range = $window.rangy.createRangyRange();
+				range.selectNode(jQuery('.ta-text ul li:first-child')[0]);
+				range.collapse(true);
+				sel.setSingleRange(range);
+				sel.refresh();
+				findAndTriggerButton('clear');
+				expect($rootScope.htmlcontent).toBe('<p>Test <b>1</b></p><ul><li>Test 2</li></ul>');
+			});
+			
+			it('as last in list', function(){
+				$rootScope.htmlcontent = '<ul><li>Test <b>1</b></li><li>Test 2</li></ul>';
+				$rootScope.$digest();
+				var sel = $window.rangy.getSelection();
+				var range = $window.rangy.createRangyRange();
+				range.selectNode(jQuery('.ta-text ul li:last-child')[0]);
+				range.collapse(true);
+				sel.setSingleRange(range);
+				sel.refresh();
+				findAndTriggerButton('clear');
+				expect($rootScope.htmlcontent).toBe('<ul><li>Test <b>1</b></li></ul><p>Test 2</p>');
+			});
+			
+			it('as middle in list', function(){
+				$rootScope.htmlcontent = '<ul><li>Test <b>1</b></li><li>Test 2</li><li>Test 3</li></ul>';
+				$rootScope.$digest();
+				var sel = $window.rangy.getSelection();
+				var range = $window.rangy.createRangyRange();
+				range.selectNode(jQuery('.ta-text ul li:nth-child(2)')[0]);
+				range.collapse(true);
+				sel.setSingleRange(range);
+				sel.refresh();
+				findAndTriggerButton('clear');
+				expect($rootScope.htmlcontent).toBe('<ul><li>Test <b>1</b></li></ul><p>Test 2</p><ul><li>Test 3</li></ul>');
+			});
+		});
 	});
 	
 	describe('test link functions and button', function(){
@@ -516,7 +575,7 @@ describe('taTools test tool actions', function(){
 			editorScope.displayElements.popoverContainer.find('button').eq(0).triggerHandler('click');
 			$rootScope.$digest();
 			val = editorScope.displayElements.text.find('p').find('img').css('width');
-			if(jQuery === angular.element) expect(val).toBe('360px');
+			if(jQuery === angular.element) expect(val).toBe('384px');
 			else expect(val).toBe('100%');
 		});
 		
@@ -525,7 +584,7 @@ describe('taTools test tool actions', function(){
 			editorScope.displayElements.popoverContainer.find('button').eq(1).triggerHandler('click');
 			$rootScope.$digest();
 			val = editorScope.displayElements.text.find('p').find('img').css('width');
-			if(jQuery === angular.element) expect(val).toBe('180px');
+			if(jQuery === angular.element) expect(val).toBe('192px');
 			else expect(val).toBe('50%');
 		});
 		
@@ -534,7 +593,7 @@ describe('taTools test tool actions', function(){
 			editorScope.displayElements.popoverContainer.find('button').eq(2).triggerHandler('click');
 			$rootScope.$digest();
 			val = editorScope.displayElements.text.find('p').find('img').css('width');
-			if(jQuery === angular.element) expect(val).toBe('90px');
+			if(jQuery === angular.element) expect(val).toBe('96px');
 			else expect(val).toBe('25%');
 		});
 		

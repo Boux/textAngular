@@ -51,10 +51,10 @@ describe('taBind', function () {
 				$rootScope.html = '';
 				var element = $compile('<div ta-bind id="test" contenteditable="true" ng-model="html" placeholder="Add Comment"></div>')($rootScope);
 				$rootScope.$digest();
-				expect(document.styleSheets[2].rules.length).toBe(1);
+				expect(document.styleSheets[1].rules.length).toBe(1);
 				element.scope().$destroy();
 				$rootScope.$digest();
-				expect(document.styleSheets[2].rules.length).toBe(0);
+				expect(document.styleSheets[1].rules.length).toBe(0);
 			}));
 		});
 		
@@ -245,6 +245,45 @@ describe('taBind', function () {
 			jQuery(element.find('a')[0]).trigger('click');
 		});
 		
+		describe('should trim empty content', function(){
+			it('returns undefined when <p></p>', function(){
+				element.html('<p></p>');
+				$rootScope.updateTaBind();
+				$rootScope.$digest();
+				expect($rootScope.html).toBe('');
+			});
+			it('returns undefined when <p><br/></p>', function(){
+				element.html('<p><br/></p>');
+				$rootScope.updateTaBind();
+				$rootScope.$digest();
+				expect($rootScope.html).toBe('');
+			});
+			it('returns undefined when single whitespace', function(){
+				element.html('<p> </p>');
+				$rootScope.updateTaBind();
+				$rootScope.$digest();
+				expect($rootScope.html).toBe('');
+			});
+			it('returns undefined when single &nbsp;', function(){
+				element.html('<p>&nbsp;</p>');
+				$rootScope.updateTaBind();
+				$rootScope.$digest();
+				expect($rootScope.html).toBe('');
+			});
+			it('returns undefined when multiple &nbsp;', function(){
+				element.html('<p>&nbsp;&nbsp;&nbsp;</p>');
+				$rootScope.updateTaBind();
+				$rootScope.$digest();
+				expect($rootScope.html).toBe('');
+			});
+			it('returns undefined whith mixed &nbsp; and whitespace', function(){
+				element.html('<p>&nbsp; &nbsp; &nbsp;</p>');
+				$rootScope.updateTaBind();
+				$rootScope.$digest();
+				expect($rootScope.html).toBe('');
+			});
+		});
+		
 		describe('should respect the ta-default-wrap value', function(){
 			describe('on focus', function(){
 				it('default to p element', inject(function($rootScope, $compile){
@@ -296,6 +335,34 @@ describe('taBind', function () {
 					element.triggerHandler('keyup');
 					$rootScope.$digest();
 					expect(element.html()).toBe('');
+				}));
+			});
+			describe('on ignoring keys press', function() {
+				it('should ignore blocked keys events', inject(function($rootScope, $compile, $window, $document, taSelection) {
+					var BLOCKED_KEYS = [19,20,27,33,34,35,36,37,38,39,40,45,46,112,113,114,115,116,117,118,119,120,121,122,123,144,145],
+						eventSpy = spyOn(taSelection, 'setSelectionToElementStart').andCallThrough(),
+						event;
+					$rootScope.html = '<p><br></p>';
+					element = $compile('<div ta-bind ta-default-wrap="b" contenteditable="contenteditable" ng-model="html"></div>')($rootScope);
+					$document.find('body').append(element);
+					$rootScope.$digest();
+					var range = $window.rangy.createRangyRange();
+					range.selectNodeContents(element.children()[0]);
+					$window.rangy.getSelection().setSingleRange(range);
+
+					BLOCKED_KEYS.forEach(function(key) {
+						if(angular.element === jQuery) {
+							event = jQuery.Event('keyup');
+							event.keyCode = key;
+							element.triggerHandler(event);
+						}else{
+							event = {keyCode: key};
+							element.triggerHandler('keyup', event);
+						}
+						$rootScope.$digest();
+						expect(eventSpy).not.toHaveBeenCalled();
+					});
+					element.remove();
 				}));
 			});
 			describe('on enter press', function(){
@@ -515,6 +582,8 @@ describe('taBind', function () {
 					};
 					element.triggerHandler('paste');
 					$rootScope.$digest();
+					$timeout.flush();
+					$rootScope.$digest();
 					expect(ok).toBe(true);
 					$window.clipboardData = undefined;
 					document.selection = undefined;
@@ -523,17 +592,23 @@ describe('taBind', function () {
 				it('non-ie based w/o jquery', inject(function($window){
 					element.triggerHandler('paste', {clipboardData: {getData: function(){ return 'Test 3 Content'; }}});
 					$rootScope.$digest();
+					$timeout.flush();
+					$rootScope.$digest();
 					expect($rootScope.html).toBe('<p>Test 3 Content</p>');
 				}));
 				
 				it('non-ie based w/ jquery', inject(function($window){
 					element.triggerHandler('paste', {originalEvent: {clipboardData: {getData: function(){ return 'Test 3 Content'; } }}});
 					$rootScope.$digest();
+					$timeout.flush();
+					$rootScope.$digest();
 					expect($rootScope.html).toBe('<p>Test 3 Content</p>');
 				}));
 				
 				it('non-ie based w/o paste content', inject(function($window){
 					element.triggerHandler('paste');
+					$rootScope.$digest();
+					$timeout.flush();
 					$rootScope.$digest();
 					expect($rootScope.html).toBe('<p>Test Contents</p>');
 				}));
