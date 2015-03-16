@@ -13,3 +13,16 @@
 .ta-root .ta-resizer-handle-overlay > .ta-resizer-handle-corner-tr{top: 0; right: 0; border-right: 1px solid black; border-top: 1px solid black;}
 .ta-root .ta-resizer-handle-overlay > .ta-resizer-handle-corner-bl{bottom: 0; left: 0; border-left: 1px solid black; border-bottom: 1px solid black;}
 .ta-root .ta-resizer-handle-overlay > .ta-resizer-handle-corner-br{bottom: 0; right: 0; border: 1px solid black; cursor: se-resize; background-color: white;}
+
+
+/* fix when the clickable section of the editor was only the first line */
+.ta-root .ta-scroll-window
+{
+    position: relative;
+}
+.ta-root .ta-scroll-window div[contenteditable=true]
+{
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    padding: 5px 10px;
+}
