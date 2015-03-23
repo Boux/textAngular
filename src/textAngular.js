@@ -1462,38 +1462,58 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 
 					var setupToolElement = function(toolDefinition, toolScope){
 						var toolElement;
+						var buttonElement;
 						var _activeEl;
 						var _savedSelection;
 
 						if(toolDefinition && toolDefinition.display){
-							toolElement = angular.element(toolDefinition.display);
+							toolElement = buttonElement = angular.element(toolDefinition.display);
 						}
-						else toolElement = angular.element("<button type='button'>");
+						else if(angular.isDefined(toolDefinition.actions)) {
+							toolElement = angular.element("<div class='btn-group btn-group-sm dropdown' dropdown></div>");
+							buttonElement = angular.element("<button type='button' class='dropdown-toggle' dropdown-toggle>");
+							toolElement.append(buttonElement);
+						} else {
+							toolElement = buttonElement = angular.element("<button type='button'>");
+						}
 
-						toolElement.addClass(scope.classes.toolbarButton);
-						toolElement.attr('name', toolScope.name);
+						buttonElement.addClass(scope.classes.toolbarButton);
+						buttonElement.attr('name', toolScope.name);
 						// important to not take focus from the main text/html entry
-						toolElement.attr('unselectable', 'on');
-						toolElement.attr('ng-disabled', 'isDisabled()');
-						toolElement.attr('tabindex', '-1');
-						toolElement.attr('ng-class', 'displayActiveToolClass(active)');
+						buttonElement.attr('unselectable', 'on');
+						buttonElement.attr('ng-disabled', 'isDisabled()');
+						buttonElement.attr('tabindex', '-1');
+						buttonElement.attr('ng-class', 'displayActiveToolClass(active)');
 
 						if(angular.isDefined(toolDefinition.actions)) {
 							toolScope.dropdownOpened = false;
-							toolElement.attr('is-open', 'dropdownOpened');
-							toolElement.attr('ng-click', '!dropdownOpened ? executeAction() : null');
+							buttonElement.attr('is-open', 'dropdownOpened');
+							buttonElement.attr('ng-click', '!dropdownOpened ? executeAction() : null');
 
 							toolScope.$watch("dropdownOpened", function(opened) {
 								if(!opened && _savedSelection) {
 									$window.rangy.removeMarkers(_savedSelection);
 								}
 							});
+
+							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(undefined, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
+							toolElement.append(dropdownEl);
+
+							toolElement.on('mouseup', function () {
+								if(!_activeEl || !_savedSelection) return;
+
+								$timeout(function() {
+									angular.element(_activeEl).focus();
+									$window.rangy.restoreSelection(_savedSelection);
+								});
+							});
+
 						} else {
-							toolElement.attr('ng-click', 'executeAction()');
+							buttonElement.attr('ng-click', 'executeAction()');
 						}
 
 						if (toolDefinition && toolDefinition.tooltiptext) {
-							toolElement.attr('title', toolDefinition.tooltiptext);
+							buttonElement.attr('title', toolDefinition.tooltiptext);
 						}
 
 						toolElement.on('mousedown', function(e, eventData){
@@ -1510,36 +1530,17 @@ See README.md or https://github.com/fraywing/textAngular/wiki for requirements a
 						});
 						if(toolDefinition && !toolDefinition.display && !toolScope._display){
 							// first clear out the current contents if any
-							toolElement[0].innerHTML = '';
+							buttonElement[0].innerHTML = '';
 							// add the buttonText
-							if(toolDefinition.buttontext) toolElement[0].innerHTML = toolDefinition.buttontext;
+							if(toolDefinition.buttontext) buttonElement[0].innerHTML = toolDefinition.buttontext;
 							// add the icon to the front of the button if there is content
 							if(toolDefinition.iconclass){
-								var icon = angular.element('<i>'), content = toolElement[0].innerHTML;
+								var icon = angular.element('<i>'), content = buttonElement[0].innerHTML;
 								icon.addClass(toolDefinition.iconclass);
-								toolElement[0].innerHTML = '';
-								toolElement.append(icon);
-								if(content && content !== '') toolElement.append('&nbsp;' + content);
+								buttonElement[0].innerHTML = '';
+								buttonElement.append(icon);
+								if(content && content !== '') buttonElement.append('&nbsp;' + content);
 							}
-						}
-
-						if(angular.isDefined(toolDefinition.actions)) {
-							toolElement.addClass("dropdown");
-							toolElement.addClass("dropdown-toggle");
-							toolElement.attr("dropdown", "");
-							toolElement.attr("dropdown-toggle", "");
-
-							var dropdownEl = angular.element("<ul class=\"dropdown-menu\"><li ng-repeat=\"a in actions\"><a ng-click=\"executeAction(undefined, $index)\"><span ng-if=\"a.iconclass\" class=\"{{a.iconclass}}\"> </span>{{a.text}}</a></li></ul>");
-							toolElement.append(dropdownEl);
-
-							toolElement.on('focus', function(e) {
-								if(!_activeEl || !_savedSelection) return;
-
-								$timeout(function() {
-									angular.element(_activeEl).focus();
-									$window.rangy.restoreSelection(_savedSelection);
-								});
-							});
 						}
 
 						toolScope._lastToolDefinition = angular.copy(toolDefinition);
